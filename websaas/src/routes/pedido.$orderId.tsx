@@ -11,7 +11,7 @@ import {
   Clock,
 } from "lucide-react";
 
-import { orderQuery } from "@/lib/queries";
+import { DEMO_MODE, orderQuery, DEMO_ORDER_KEY } from "@/lib/queries";
 import { formatBRL, formatPhone } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -36,6 +36,7 @@ function TrackingPage() {
 
   // Realtime: escuta mudanças no pedido
   useEffect(() => {
+    if (DEMO_MODE) return;
     const channel = supabase
       .channel(`order-${orderId}`)
       .on(

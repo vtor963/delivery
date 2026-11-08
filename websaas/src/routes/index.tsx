@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { cartStore, useCart, type CartItem } from "@/lib/cart";
-import { DEMO_SLUG, menuQuery, restaurantQuery } from "@/lib/queries";
+import { DEMO_MODE, DEMO_SLUG, menuQuery, restaurantQuery } from "@/lib/queries";
 import { formatBRL } from "@/lib/format";
 import { createOrder } from "@/lib/orders";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
@@ -438,6 +438,13 @@ function CheckoutDialog({
       });
 
       const trackingUrl = `${window.location.origin}/pedido/${order.id}`;
+      if (DEMO_MODE) {
+        cartStore.clear();
+        onClose();
+        toast.success("Pedido de demonstração criado!");
+        navigate({ to: "/pedido/$orderId", params: { orderId: order.id } });
+        return;
+      }
       const waUrl = buildWhatsAppUrl({
         orderId: order.id,
         restaurantPhone: restaurant.phone.replace(/\D/g, ""),

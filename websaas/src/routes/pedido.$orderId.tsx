@@ -11,7 +11,7 @@ import {
   Clock,
 } from "lucide-react";
 
-import { DEMO_MODE, orderQuery, DEMO_ORDER_KEY } from "@/lib/queries";
+import { DEMO_MODE, orderQuery } from "@/lib/queries";
 import { formatBRL, formatPhone } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -139,6 +139,42 @@ function TrackingPage() {
             })}
           </div>
         </section>
+
+        {DEMO_MODE && (
+          <section className="glass rounded-2xl p-4">
+            <p className="text-sm font-semibold">Modo demonstração</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Simule a atualização do pedido para mostrar o acompanhamento ao comprador.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {[
+                ["pending", "Recebido"],
+                ["preparing", "Em preparo"],
+                ["dispatched", "Saiu para entrega"],
+                ["delivered", "Entregue"],
+              ].map(([status, label]) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    const next = { ...order, status };
+                    qc.setQueryData(["order", orderId], next);
+                    try {
+                      const key = "delivery_demo_orders_v1";
+                      const saved = JSON.parse(window.localStorage.getItem(key) || "{}");
+                      saved[orderId] = next;
+                      window.localStorage.setItem(key, JSON.stringify(saved));
+                    } catch (error) {
+                      console.error("Não foi possível salvar o status da demo", error);
+                    }
+                  }}
+                  className={`rounded-full px-3 py-2 text-xs font-medium transition-colors ${order.status === status ? "ember-gradient text-primary-foreground" : "glass hover:border-[color:var(--ember)]/50"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Detalhes */}
         <section className="glass rounded-3xl p-6">
